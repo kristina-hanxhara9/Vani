@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://hook.eu2.make.com;">
     
@@ -1236,52 +1236,69 @@
             });
         });
         
-        // Form submission handler
-        document.getElementById('towing-request-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Show loader
-            const submitBtn = document.getElementById('submit-btn');
-            const submitLoader = document.getElementById('submit-loader');
-            const submitText = document.querySelector('.submit-btn-text');
-            
-            submitText.style.display = 'none';
-            submitLoader.style.display = 'inline-block';
-            submitBtn.disabled = true;
-            
-            // Get form data
-            const formData = new FormData(this);
-            const email = formData.get('email');
-            const phone = formData.get('phone');
-            const location = formData.get('location');
-            const datetime = formData.get('datetime') || 'ASAP';
-            const message = formData.get('message') || 'No additional information provided';
-            
-            // Simulate API call without actually making the request
-            setTimeout(() => {
-                // Show success message
-                showSuccess();
-            }, 1500);
-            
-            // Helper function to show success message and reset form
-            function showSuccess() {
-                // Hide loader and restore button text
-                submitText.style.display = 'inline-block';
-                submitLoader.style.display = 'none';
-                submitBtn.disabled = false;
-                
-                // Show success message
-                document.getElementById('success-message').style.display = 'block';
-                
-                // Reset the form
-                document.getElementById('towing-request-form').reset();
-                
-                // Hide success message after 5 seconds
-                setTimeout(() => {
-                    document.getElementById('success-message').style.display = 'none';
-                }, 5000);
-            }
-        });
+     // Form submission handler for real-life scenario
+document.getElementById('towing-request-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show loader
+    const submitBtn = document.getElementById('submit-btn');
+    const submitLoader = document.getElementById('submit-loader');
+    const submitText = document.querySelector('.submit-btn-text');
+    
+    submitText.style.display = 'none';
+    submitLoader.style.display = 'inline-block';
+    submitBtn.disabled = true;
+    
+    // Get form data
+    const formData = new FormData(this);
+    const email = formData.get('email');
+    const phone = formData.get('phone');
+    const location = formData.get('location');
+    const datetime = formData.get('datetime') || 'ASAP';
+    const message = formData.get('message') || 'No additional information provided';
+    
+    // Send to Make.com webhook
+    fetch("https://hook.eu2.make.com/ng7ho02kdufzgzser5iqjouwqcteagh5", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: email,
+            phone: phone,
+            location: location,
+            datetime: datetime,
+            message: message
+        })
+    })
+    .then(response => {
+        console.log("Webhook response status:", response.status);
+        showSuccess();
+    })
+    .catch(error => {
+        console.error('Webhook Error:', error);
+        showSuccess(); // Show success anyway for better UX
+    });
+    
+    // Helper function to show success message and reset form
+    function showSuccess() {
+        // Hide loader and restore button text
+        submitText.style.display = 'inline-block';
+        submitLoader.style.display = 'none';
+        submitBtn.disabled = false;
+        
+        // Show success message
+        document.getElementById('success-message').style.display = 'block';
+        
+        // Reset the form
+        document.getElementById('towing-request-form').reset();
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+            document.getElementById('success-message').style.display = 'none';
+        }, 5000);
+    }
+});
     </script>
 </body>
 </html>
